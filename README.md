@@ -1,7 +1,6 @@
 # Plaza Inteligente — NODOSPLAZA
 
-Sistema de monitoreo IoT para parques caninos urbanos. Pipeline de visión computacional e IA para análisis de confort térmico, afluencia y uso del mobiliario.
-**Piloto:** Canil 3 Poniente, Maipú, Chile.  
+Sistema de monitoreo IoT para parques caninos urbanos. Pipeline de visión computacional e IA para análisis de confort térmico, afluencia y uso del mobiliario.  
 **Estado:** En desarrollo — fase de prototipo en notebook.
 
 ## Stack
@@ -12,25 +11,25 @@ Sistema de monitoreo IoT para parques caninos urbanos. Pipeline de visión compu
 - **Modelos IA:** YOLOv8s, BDRAR, KMeans — *implementados en notebook*
 ## Archivos
 
-- `pipeline.ipynb` — notebook principal con visualizaciones y prints de debugging
-- `pipeline_small.ipynb` — pipeline limpio sin outputs intermedios, base para producción
-- `capturar.py` — script para capturar frames desde livestreams de YouTube (datos de prueba)
+- `pipeline.ipynb`: notebook principal con visualizaciones y prints de debugging
+- `pipeline_small.ipynb`: pipeline limpio sin outputs intermedios
+- `capturar.py`: script para capturar frames desde livestreams de YouTube (datos de prueba)
 
 ---
 
-## Pipeline implementado ✅
+## Pipeline implementado
 
 | Fase | Descripción | Estado |
 |------|-------------|--------|
-| 0.5 | Insertar imágenes de cámara | ✅ funcional con frames de prueba |
+| 0.5 | Insertar imágenes de cámara | funcional con frames de prueba |
 | 1 | YOLO — detección personas, mascotas, mobiliario | ✅ |
 | 2 | BDRAR — máscara de sombra + shade utilization | ✅ |
 | 3 | Uso mobiliario por snapshot | ✅ bboxes manuales provisorias |
-| 3.5 | Construcción snapshot_record + datos sensores | ✅ sensores simulados |
+| 3.5 | Construcción snapshot_record + datos sensores | sensores simulados |
 | 4 | UTCI con pythermalcomfort | ✅ |
 | 5 | Aglomeración y densidad | ✅ |
-| 5.5 | Guardar en BD (CSV local) | ✅ → migrar a RDS |
-| 6 | Métricas batch | ✅ con imágenes reales de prueba |
+| 5.5 | Guardar en BD (CSV local) | migrar a RDS |
+| 6 | Métricas batch | ✅ |
 | 7 | KMeans — mapa de islas de calor | ✅ |
 
 ---
@@ -47,9 +46,9 @@ Ocupación sostenida · Activity classification · Uso mobiliario histórico · 
 
 ## Pendiente
 
-- [ ] Instalación física cámara y sensores en Canil 3 Poniente
+- [ ] Instalación física cámara y sensores en Canil
 - [ ] Definir bboxes manuales del mobiliario real con imagen de la cámara instalada
-- [ ] Reemplazar datos de sensores simulados por datos reales del Nodo B
+- [ ] Reemplazar datos de sensores simulados por datos reales del Nodo
 - [ ] Levantar servidor AWS y conectar con RPi
 - [ ] Migrar CSV local a PostgreSQL/RDS
 - [ ] Convertir pipeline_small.ipynb en FastAPI para producción
