@@ -1,0 +1,40 @@
+# ── Datos generados (se regeneran corriendo el código) ───────────────
+*.csv
+
+# ── Imágenes y frames de captura (pesados, datos de prueba) ──────────
+frames_*/
+*.jpg
+*.jpeg
+*.png
+*.mp4
+# excepción: el satelital que el notebook necesita para dibujar
+!mapa_conimg.png
+
+# ── Pesos de modelos (se descargan/regeneran, muy pesados) ───────────
+*.pt
+*.pth
+yolov8*.pt
+
+# ── Artefactos ERA5 ───────
+# modelo_era5_mrt.pkl
+# modelo_era5_scaler.pkl
+# modelo_era5_metadata.pkl
+# modelo_era5_viento_climatologico.pkl
+
+# ── CREDENCIALES — NUNCA subir ───────────────────────────────────────
+*.cdsapirc
+.cdsapirc
+*cookies*
+.env
+secrets.*
+
+# ── Carpetas de datos crudos ─────────────────────────────────────────
+data_original_utci/
+era5_extraido/
+Shadow-Detection-and-Removal/
+
+# ── Basura de sistema / Python ───────────────────────────────────────
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
