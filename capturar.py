@@ -1,12 +1,13 @@
+
 import subprocess, sys, os, datetime, time
 
-CARPETA_SALIDA  = f'frames_cinquez_{datetime.date.today().strftime("%Y%m%d")}'
+CARPETA_SALIDA  = f'frames_cinquez_west_{datetime.date.today().strftime("%Y%m%d")}'
 ANCHO, ALTO     = 1280, 720
 INTERVALO_SEG   = 5
 DURACION_HORAS  = 12
-URL_STREAM      = 'https://www.youtube.com/watch?v=EsWV4O2ishg'
+URL_STREAM      = 'https://www.youtube.com/watch?v=i9LKXrE5QYA'  # ← cámara WEST (nuevo)
 ARCHIVO_COOKIES = 'cookies_youtube.txt'
-PYTHON = r'C:\Users\ACER\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe'
+PYTHON = sys.executable
 
 os.makedirs(CARPETA_SALIDA, exist_ok=True)
 
@@ -16,41 +17,55 @@ def obtener_url():
          '-g', '-f', 'best[height<=720]', URL_STREAM],
         capture_output=True, text=True, timeout=60
     )
+    if r.returncode != 0:
+        print('⚠️  Error obteniendo URL:', r.stderr[:300])
+        return None
     return r.stdout.strip().split('\n')[0]
 
-url_directa       = obtener_url()
-ultima_renovacion = time.time()
-n_capturas        = int(DURACION_HORAS * 3600 / INTERVALO_SEG)
-print(f'✅ URL obtenida — guardando en {CARPETA_SALIDA}/')
-print(f'Total frames a capturar: {n_capturas}')
+url_directa = obtener_url()
+if not url_directa:
+    sys.exit('❌ No se pudo obtener la URL.')
 
+ultima_renovacion = time.time()
+t_fin  = time.time() + DURACION_HORAS * 3600   # corta por TIEMPO, no por conteo
 guardados = 0
 fallidos  = 0
+i = 0
 
-for i in range(n_capturas):
+print(f'✅ Capturando cada {INTERVALO_SEG}s por {DURACION_HORAS}h en {CARPETA_SALIDA}/')
+
+while time.time() < t_fin:
+    ciclo_inicio = time.time()   # ← marca cuándo empieza este ciclo
+
     if time.time() - ultima_renovacion > 7200:
-        print('Renovando URL...')
-        url_directa       = obtener_url()
-        ultima_renovacion = time.time()
-        print('✅ URL renovada')
+        nueva = obtener_url()
+        if nueva:
+            url_directa = nueva
+            ultima_renovacion = time.time()
+            print('✅ URL renovada')
 
     ts   = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     ruta = os.path.join(CARPETA_SALIDA, f'{ts}.jpg')
 
-    r = subprocess.run(
-        ['ffmpeg', '-i', url_directa,
-         '-frames:v', '1', '-vf', f'scale={ANCHO}:{ALTO}',
-         '-y', ruta],
-        capture_output=True, timeout=15
-    )
+    try:
+        subprocess.run(
+            ['ffmpeg', '-i', url_directa, '-frames:v', '1',
+             '-vf', f'scale={ANCHO}:{ALTO}', '-y', ruta],
+            capture_output=True, timeout=15
+        )
+    except Exception:
+        fallidos += 1
 
     if os.path.exists(ruta) and os.path.getsize(ruta) > 1000:
         guardados += 1
-        print(f'  [{i+1}/{n_capturas}] {ts} → ok ({guardados} guardados)')
+        if guardados % 10 == 0:
+            print(f'  {ts} → {guardados} guardados ({fallidos} fallidos)')
     else:
         fallidos += 1
-        print(f'  [{i+1}/{n_capturas}] {ts} → fallido ({fallidos} fallidos)')
 
-    time.sleep(max(0, INTERVALO_SEG - 5))
+    i += 1
+    # esperar lo que FALTE para completar los 5 seg desde el inicio del ciclo
+    transcurrido = time.time() - ciclo_inicio
+    time.sleep(max(0, INTERVALO_SEG - transcurrido))
 
-print(f'\n✅ Listo — {guardados} frames en {CARPETA_SALIDA}/')
+print(f'\n✅ Listo — {guardados} frames en {CARPETA_SALIDA}/  ({fallidos} fallidos)')
